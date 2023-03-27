@@ -8,13 +8,29 @@ List<CameraDescription> cameras = [];
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: MyHomePage(),
   ));
 }
+ class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+      ),
+      home: const MyHomePage(),
+    );
+  }
+}
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -48,20 +64,21 @@ class _MyHomePageState extends State<MyHomePage> {
           audioPlayer1.stop();
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => CameraApp()),
+            MaterialPageRoute(builder: (context) => const CameraApp()),
           );
         },
 
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/money.jpg'),
               fit: BoxFit.fill,
             ),
           ),
           child: Stack(
+            // ignore: prefer_const_literals_to_create_immutables
             children: [
-              Positioned(
+              const Positioned(
                 top: 340,
                 bottom: 100,
                 left: 150,
@@ -130,12 +147,13 @@ class _CameraAppState extends State<CameraApp> {
         onTap: () async {
           audioPlayer2.stop();
           if (!_controller.value.isInitialized) {
-            return null;}
+            return;}
           if (_controller.value.isTakingPicture) {
-            return null;}
+            return;}
           try {
             await _controller.setFlashMode(FlashMode.auto);
             XFile file = await _controller.takePicture();
+            // ignore: use_build_context_synchronously
             Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -143,13 +161,14 @@ class _CameraAppState extends State<CameraApp> {
           }
           on CameraException catch (e) {
             debugPrint('Error occured while taking pic ');
-            return null;
+            return;
           }
         },
         child: CameraPreview(_controller),
 
       ),);
   }}
+// ignore: must_be_immutable
 class ImagePreview extends StatefulWidget {
   ImagePreview(this.file, {super.key});
   XFile file;
@@ -175,7 +194,7 @@ class _ImagePreviewState extends State<ImagePreview> {
   Widget build(BuildContext context) {
     File picture = File(widget.file.path);
     return Scaffold(
-      appBar: AppBar(title: Text('your photo')),
+      appBar: AppBar(title: const Text('your photo')),
       body: Center(
           child: Image.file(picture)
       ),
