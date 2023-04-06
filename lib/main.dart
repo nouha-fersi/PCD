@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:camera/camera.dart';
 import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 List<CameraDescription> cameras = [];
 
@@ -12,7 +14,8 @@ Future<void> main() async {
     home: MyHomePage(),
   ));
 }
- class MyApp extends StatelessWidget {
+
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
@@ -36,7 +39,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  AudioCache audioCache1= AudioCache();// variable which state is going to change
+  AudioCache audioCache1 =
+      AudioCache(); // variable which state is going to change
   AudioPlayer audioPlayer1 = AudioPlayer();
   bool isAudioPlayed = true;
 
@@ -45,15 +49,16 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     playAudio();
   }
+
   void playAudio() async {
-    audioPlayer1= await audioCache1.play('Voix.m4a');
+    audioPlayer1 = await audioCache1.play('Voix.m4a');
   }
+
   @override
   void dispose() {
     audioPlayer1.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
             MaterialPageRoute(builder: (context) => const CameraApp()),
           );
         },
-
         child: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
@@ -83,7 +87,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 bottom: 100,
                 left: 150,
                 right: 90,
-                child: Text('tap anywhere ',
+                child: Text(
+                  'tap anywhere ',
                   style: TextStyle(
                     fontSize: 60,
                     color: Colors.black,
@@ -92,14 +97,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ],
-
           ),
         ),
       ),
     );
-
   }
 }
+
 class CameraApp extends StatefulWidget {
   const CameraApp({super.key});
 
@@ -108,12 +112,13 @@ class CameraApp extends StatefulWidget {
 }
 
 class _CameraAppState extends State<CameraApp> {
-  AudioCache audioCache2= AudioCache();// variable which state is going to change
+  AudioCache audioCache2 =
+      AudioCache(); // variable which state is going to change
   AudioPlayer audioPlayer2 = AudioPlayer();
   bool isAudioPlayed = true;
   late CameraController _controller;
   void playAudio2() async {
-    audioPlayer2= await audioCache2.play('sound3.mp3');
+    audioPlayer2 = await audioCache2.play('sound3.mp3');
   }
 
   @override
@@ -147,27 +152,28 @@ class _CameraAppState extends State<CameraApp> {
         onTap: () async {
           audioPlayer2.stop();
           if (!_controller.value.isInitialized) {
-            return;}
+            return;
+          }
           if (_controller.value.isTakingPicture) {
-            return;}
+            return;
+          }
           try {
             await _controller.setFlashMode(FlashMode.auto);
             XFile file = await _controller.takePicture();
             // ignore: use_build_context_synchronously
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ImagePreview(file)));
-          }
-          on CameraException catch (e) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ImagePreview(file)));
+          } on CameraException catch (e) {
             debugPrint('Error occured while taking pic ');
             return;
           }
         },
         child: CameraPreview(_controller),
+      ),
+    );
+  }
+}
 
-      ),);
-  }}
 // ignore: must_be_immutable
 class ImagePreview extends StatefulWidget {
   ImagePreview(this.file, {super.key});
@@ -175,28 +181,90 @@ class ImagePreview extends StatefulWidget {
 
   @override
   State<ImagePreview> createState() => _ImagePreviewState();
-
 }
 
 class _ImagePreviewState extends State<ImagePreview> {
-  AudioCache audioCache3= AudioCache();
+  String url = 'http://192.168.1.14:5000/predict';
+  Future<String> fetchdata(File imageFile) async {
+    // Create a multipart request with the image file in the request body
+    var request = http.MultipartRequest('POST', Uri.parse(url));
+    request.files
+        .add(await http.MultipartFile.fromPath('file', imageFile.path));
+
+    // Send the request to the server
+    var response = await request.send();
+
+    // Check if the response was successful
+    if (response.statusCode == 200) {
+      // Decode the response JSON and extract the predicted label
+      var decoded = await response.stream.bytesToString();
+      final predictedLabel = jsonDecode(decoded)['prediction'];
+
+      // Return the predicted label
+      return predictedLabel.toString();
+    } else {
+      // If the response was not successful, throw an error
+      throw Exception('Failed to fetch data');
+    }
+  }
+
+  AudioCache audioCache3 = AudioCache();
   AudioPlayer audioPlayer3 = AudioPlayer();
   void playAudio3() async {
     audioPlayer3 = await audioCache3.play('sound3.mp3');
-  }
-  @override
-  void initState(){
-    super.initState();
-    playAudio3();
   }
 
   @override
   Widget build(BuildContext context) {
     File picture = File(widget.file.path);
+    String output = 'Initial Output';
+    Future<String> _getImageAndPredict() async {
+      // Get an image from the device's photo gallery
+
+      if (picture != null) {
+        // Call the fetchdata method to get the predicted label
+        try {
+          output = await fetchdata(File(widget.file.path));
+        } catch (e) {
+          // Handle any errors that occur during the fetch
+          output = 'Error: $e';
+        }
+      } else {
+        // If the user did not pick an image, set the output to an empty string
+        output = '';
+      }
+      return output;
+      // Update the UI with the predicted label or an error message
+      setState(() {});
+    }
+
+    @override
+    void initState() {
+      super.initState();
+      playAudio3();
+      _getImageAndPredict;
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('your photo')),
-      body: Center(
-          child: Image.file(picture)
+      appBar: AppBar(title: const Text('Your Photo')),
+      body: Column(
+        children: [
+          Expanded(
+            child: Image.file(
+              picture,
+              fit: BoxFit.fitWidth,
+            ),
+          ),
+          FutureBuilder<String>(
+              future: _getImageAndPredict(),
+              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Text(snapshot.data!);
+                } else {
+                  return Text(output);
+                }
+              }),
+        ],
       ),
     );
   }
