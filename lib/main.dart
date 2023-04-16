@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_tts/flutter_tts.dart';
 
 List<CameraDescription> cameras = [];
 
@@ -14,7 +15,6 @@ Future<void> main() async {
     home: MyHomePage(),
   ));
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -182,9 +182,8 @@ class ImagePreview extends StatefulWidget {
   @override
   State<ImagePreview> createState() => _ImagePreviewState();
 }
-
 class _ImagePreviewState extends State<ImagePreview> {
-  String url = 'http://192.168.1.14:5000/predict';
+  String url = 'http://192.168.1.15:5000/predict';
   Future<String> fetchdata(File imageFile) async {
     // Create a multipart request with the image file in the request body
     var request = http.MultipartRequest('POST', Uri.parse(url));
@@ -218,6 +217,8 @@ class _ImagePreviewState extends State<ImagePreview> {
   Widget build(BuildContext context) {
     File picture = File(widget.file.path);
     String output = 'Initial Output';
+    FlutterTts flutterTts = FlutterTts();
+    flutterTts.setLanguage("ar");
     Future<String> _getImageAndPredict() async {
       // Get an image from the device's photo gallery
 
@@ -259,7 +260,9 @@ class _ImagePreviewState extends State<ImagePreview> {
               future: _getImageAndPredict(),
               builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  return Text(snapshot.data!);
+                  String ttsText = snapshot.data ?? ""; // Get the data from snapshot or use empty string if null
+                  flutterTts.speak(ttsText); // Use flutterTts to speak the text
+                  return Text(ttsText);
                 } else {
                   return Text(output);
                 }
@@ -269,3 +272,4 @@ class _ImagePreviewState extends State<ImagePreview> {
     );
   }
 }
+
