@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:camera/camera.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:video_player/video_player.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:flutter/animation.dart';
+import 'dart:async';
+import 'dart:math' as math ;
+double percentage = 0.0;
+const double pi = 3.14159265358979323846;
+Color beige = Color(0xFFF5F5DC);
+
+
 
 List<CameraDescription> cameras = [];
 
@@ -39,64 +48,72 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  AudioCache audioCache1 =
-      AudioCache(); // variable which state is going to change
-  AudioPlayer audioPlayer1 = AudioPlayer();
-  bool isAudioPlayed = true;
-
+  late VideoPlayerController _controller1;
+  late Future<void> _initializeVideoPlayerFuture;
+  FlutterTts flutterTts1 = FlutterTts();
+  String ttsText1 = "yorja annakr ala ayi makan fi achacha li fateh al camera ";
+  Timer? _timer;
   @override
   void initState() {
     super.initState();
-    playAudio();
+    _controller1 = VideoPlayerController.asset('assets/video.mp4');
+    _initializeVideoPlayerFuture = _controller1.initialize();
+    _controller1.setLooping(true);
+    _controller1.play();
+    speak();
   }
 
-  void playAudio() async {
-    audioPlayer1 = await audioCache1.play('Voix.m4a');
+  void speak() async {
+    await flutterTts1.setLanguage("ar");
+    await flutterTts1.setPitch(1);
+    await flutterTts1.setSpeechRate(0.5);
+    const duration = Duration(seconds: 6);
+    await flutterTts1.speak(ttsText1);
+    _timer = Timer.periodic(duration, (_) {
+      if (mounted) {
+        flutterTts1.speak(ttsText1);
+      }
+    });
+
   }
 
   @override
   void dispose() {
-    audioPlayer1.dispose();
+    _controller1.dispose();
+    flutterTts1.stop();
+    _timer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: null,
       body: GestureDetector(
         onTap: () {
-          audioPlayer1.stop();
+          flutterTts1.stop();
+          _timer?.cancel();
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const CameraApp()),
           );
         },
-        child: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/money.jpg'),
-              fit: BoxFit.fill,
-            ),
-          ),
-          child: Stack(
-            // ignore: prefer_const_literals_to_create_immutables
-            children: [
-              const Positioned(
-                top: 340,
-                bottom: 100,
-                left: 150,
-                right: 90,
-                child: Text(
-                  'tap anywhere ',
-                  style: TextStyle(
-                    fontSize: 60,
-                    color: Colors.black,
-                    fontFamily: 'Cursive',
+        child: SizedBox.expand(
+          child: FutureBuilder(
+            future: _initializeVideoPlayerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return FittedBox(
+                  fit: BoxFit.cover,
+                  child: SizedBox(
+                    width: _controller1.value.size?.width ?? 0,
+                    height: _controller1.value.size?.height ?? 0,
+                    child: VideoPlayer(_controller1),
                   ),
-                ),
-              ),
-            ],
+                );
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
           ),
         ),
       ),
@@ -112,19 +129,28 @@ class CameraApp extends StatefulWidget {
 }
 
 class _CameraAppState extends State<CameraApp> {
-  AudioCache audioCache2 =
-      AudioCache(); // variable which state is going to change
-  AudioPlayer audioPlayer2 = AudioPlayer();
-  bool isAudioPlayed = true;
+  FlutterTts flutterTts2 = FlutterTts();
+  String ttsText2 = "yorja annakr ala ayi makan fi achacha li fateh al camera ";
+  Timer? _timer2;
   late CameraController _controller;
-  void playAudio2() async {
-    audioPlayer2 = await audioCache2.play('sound3.mp3');
+  void speak2() async {
+    await flutterTts2.setLanguage("ar");
+    await flutterTts2.setPitch(1);
+    await flutterTts2.setSpeechRate(0.5);
+    const duration = Duration(seconds: 6);
+    await flutterTts2.speak(ttsText2);
+    _timer2 = Timer.periodic(duration, (_) {
+      if (mounted) {
+        flutterTts2.speak(ttsText2);
+      }
+    });
+
   }
 
   @override
   void initState() {
     super.initState();
-    playAudio2();
+    speak2();
     _controller = CameraController(cameras[0], ResolutionPreset.max);
     _controller.initialize().then((_) {
       if (!mounted) {
@@ -144,13 +170,20 @@ class _CameraAppState extends State<CameraApp> {
       }
     });
   }
+  @override
+  void dispose() {
+    flutterTts2.stop();
+    _timer2?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: GestureDetector(
         onTap: () async {
-          audioPlayer2.stop();
+          flutterTts2.stop();
+          _timer2?.cancel();
           if (!_controller.value.isInitialized) {
             return;
           }
@@ -158,7 +191,7 @@ class _CameraAppState extends State<CameraApp> {
             return;
           }
           try {
-            await _controller.setFlashMode(FlashMode.auto);
+            await _controller.setFlashMode(FlashMode.off);
             XFile file = await _controller.takePicture();
             // ignore: use_build_context_synchronously
             Navigator.push(context,
@@ -168,7 +201,11 @@ class _CameraAppState extends State<CameraApp> {
             return;
           }
         },
-        child: CameraPreview(_controller),
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          child: CameraPreview(_controller),
+        ),
       ),
     );
   }
@@ -182,8 +219,12 @@ class ImagePreview extends StatefulWidget {
   @override
   State<ImagePreview> createState() => _ImagePreviewState();
 }
-class _ImagePreviewState extends State<ImagePreview> {
-  String url = 'http://192.168.1.15:5000/predict';
+class _ImagePreviewState extends State<ImagePreview> with TickerProviderStateMixin {
+  final double angle = 2 * math.pi * percentage;
+  bool _isImageTapped = false;
+  late String output;
+  String url = 'http://192.168.1.21:5000/predict';
+
   Future<String> fetchdata(File imageFile) async {
     // Create a multipart request with the image file in the request body
     var request = http.MultipartRequest('POST', Uri.parse(url));
@@ -207,11 +248,6 @@ class _ImagePreviewState extends State<ImagePreview> {
     }
   }
 
-  AudioCache audioCache3 = AudioCache();
-  AudioPlayer audioPlayer3 = AudioPlayer();
-  void playAudio3() async {
-    audioPlayer3 = await audioCache3.play('sound3.mp3');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -242,34 +278,87 @@ class _ImagePreviewState extends State<ImagePreview> {
     @override
     void initState() {
       super.initState();
-      playAudio3();
+
       _getImageAndPredict;
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Your Photo')),
-      body: Column(
-        children: [
-          Expanded(
-            child: Image.file(
-              picture,
-              fit: BoxFit.fitWidth,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: Container(
+        color: beige,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              height: 550, // adjust this value to get the desired height
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 1000),
+                transform: Matrix4.identity()
+                  ..scale(_isImageTapped ? 1.5 : 1.0)
+                  ..rotateZ(_isImageTapped ? 0.25 * pi : 0),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                ),
+                child: ClipOval(
+                  child: Image.file(
+                    picture,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                ),
+              ),
             ),
-          ),
-          FutureBuilder<String>(
-              future: _getImageAndPredict(),
-              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  String ttsText = snapshot.data ?? ""; // Get the data from snapshot or use empty string if null
-                  flutterTts.speak(ttsText); // Use flutterTts to speak the text
-                  return Text(ttsText);
-                } else {
-                  return Text(output);
-                }
-              }),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: FutureBuilder<String>(
+                future: _getImageAndPredict(),
+                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    String ttsText = snapshot.data ?? ""; // Get the data from snapshot or use empty string if null
+                    flutterTts.speak(ttsText); // Use flutterTts to speak the text
+                    return AnimatedOpacity(
+                      duration: Duration(milliseconds: 500),
+                      opacity: 1,
+                      child: Text(
+                        ttsText,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    );
+                  } else {
+                    return Text(
+                      output,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
+
   }
 }
+
+
+
+
+
 
