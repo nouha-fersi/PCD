@@ -183,7 +183,7 @@ class ImagePreview extends StatefulWidget {
   State<ImagePreview> createState() => _ImagePreviewState();
 }
 class _ImagePreviewState extends State<ImagePreview> {
-  String url = 'http://192.168.1.14:5000/predict';
+  String url = 'http://192.168.100.166:5000/predict';
   Future<String> fetchdata(File imageFile) async {
     // Create a multipart request with the image file in the request body
     var request = http.MultipartRequest('POST', Uri.parse(url));
@@ -272,4 +272,3 @@ class _ImagePreviewState extends State<ImagePreview> {
     );
   }
 }
-

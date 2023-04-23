@@ -1,4 +1,4 @@
-from flask import Flask, request, url_for, send_file ,render_template,redirect
+from flask import Flask, request, session, url_for, send_file ,render_template,redirect
 from flask_pymongo import PyMongo
 from gridfs import GridFS
 from bson.objectid import ObjectId
@@ -27,21 +27,31 @@ except Exception as e:
 
 CORS(app)
 
-
+app.config['TIMEOUT'] = 3600  # Set the timeout to 1 hour (in seconds)
 @app.route('/', methods=['GET', 'POST'])
-@app.route('/profile/', methods=['GET', 'POST'])
-def index():
+def login():
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if password == '1234':
+            return redirect('/admin')
+        else:
+            return render_template('login.html', message='Invalid password')
+    else:
+        return render_template('login.html')
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
     if request.method == 'POST':
         if 'modelh5' in request.files and 'label' in request.files:  # Update to check for both files
             modelh5 = request.files['modelh5']
             label = request.files['label']
             if modelh5.filename != '' and label.filename != '':  # Update to check for both filenames
                 fs = GridFS(client.models)
-                file_id_modelh5 = fs.put(modelh5, filename=modelh5.filename)
-                file_id_label = fs.put(label, filename=label.filename)
+                file_id_modelh5 = fs.put(modelh5, filename=modelh5.filename, chunk_size=1024*1024)
+                file_id_label = fs.put(label, filename=label.filename, chunk_size=1024*1024)
                 db = client.models
                 db['models'].insert_one({'model_name': request.form.get('model_name'), 'modelh5_name': modelh5.filename, 'label_name': label.filename})  # Update to store both filenames
-            return redirect(url_for('index'))
+            return redirect(url_for('admin'))
         else:
             return 'nooo'
     else:
