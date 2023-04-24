@@ -1,0 +1,10 @@
+0 1 dinar
+1 10 dinar
+2 100 millimes
+3 2 dinar
+4 20 dinar
+5 200 millimes
+6 5 dinar
+7 50 dinar
+8 50 millimes
+9 500 millimes

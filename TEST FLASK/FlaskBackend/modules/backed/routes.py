@@ -16,10 +16,10 @@ import base64
 
 
 mod = Blueprint('backend', __name__, template_folder='templates', static_folder='./static')
-UPLOAD_URL = 'http://192.168.1.15:5000/static/'
-path_to_model = os.path.join('C:/Users/User/Desktop/rep/PCD/TEST FLASK/FlaskBackend/modules/backed/keras_model.h5')
+UPLOAD_URL = 'http://192.168.100.166:5000/static/'
+path_to_model = os.path.join('C:/Users/msi/Desktop/ENSI/PCD/PCD/TEST FLASK/FlaskBackend/modules/backed/Xception_model.h5')
 np.set_printoptions(suppress=True)
-path_to_lable=os.path.join('C:/Users/User/Desktop/rep/PCD/TEST FLASK/FlaskBackend/modules/backed/labels.txt')
+path_to_lable=os.path.join('C:/Users/msi/Desktop/ENSI/PCD/PCD/TEST FLASK/FlaskBackend/modules/backed/labels.txt')
 model = tf.keras.models.load_model(path_to_model,compile=False)
 class_names = open(path_to_lable, "r").readlines()
 @mod.route('/')
@@ -40,7 +40,7 @@ def predict():
        
         else:
             print("hhhhh")
-            path = os.path.join('C:/Users/User/Desktop/rep/PCD/TEST FLASK/FlaskBackend/modules/static'+user_file.filename)
+            path = os.path.join('C:/Users/msi/Desktop/ENSI/PCD/PCD/TEST FLASK/FlaskBackend/modules/static'+user_file.filename)
             user_file.save(path)
             class_name = identifyImage(path)
 
@@ -92,6 +92,7 @@ def identifyImage(img_path):
     print("Confidence Score:", confidence_score)
     
     return  class_name
+
 
 
 
