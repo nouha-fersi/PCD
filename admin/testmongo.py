@@ -100,7 +100,7 @@ def delete_model(model_name):
                 # Delete the documents from the fs.chunks collection
                 db['fs.chunks'].delete_one({'_id': chunk_doc['_id']})
 
-            return redirect(url_for('index'))
+            return redirect(url_for('admin'))
         else:
             return {'error': 'Model file not found'}
     else:

@@ -8,9 +8,9 @@
         @import url('https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@300;400;500;600&display=swap');
 
 :root {
-    --main-color: #22BAA0;
-    --color-dark: #34425A;
-    --text-grey: #B0B0B0;
+    --main-color: #C3447A;
+    --color-dark: #34568B;
+    --text-grey:#DFCFBE;
 }
 
 * {
@@ -96,7 +96,7 @@
     width: 80px;
     display: inline-block;
     margin: 0 auto .5rem auto;
-    border: 3px solid #899DC1;
+    border: 3px solid #92A8D1;
 }
 
 .profile h4 {
@@ -105,7 +105,7 @@
 }
 
 .profile small {
-    color: #899DC1;
+    color: #92A8D1;
     font-weight: 600;
 }
 
@@ -123,7 +123,7 @@
 }
 
 .side-menu a.active {
-    background: #2B384E;
+    background:#29436d;
 }
 
 .side-menu a.active span, .side-menu a.active small {
@@ -323,19 +323,19 @@ main {
 }
 
 .indicator.one {
-    background: #22baa0;
+    background:#88B04B;
 }
 
 .indicator.two {
-    background: #11a8c3;
+    background:  #98B4D4;
 }
 
 .indicator.three {
-    background: #f6d433;
+    background: #EFC050;
 }
 
 .indicator.four {
-    background: #f25656;
+    background: #FE840E;
 }
 
 .records {
@@ -528,6 +528,18 @@ table tbody tr {
     table {
         width: 900px;
     }
+    .modal-header {
+            background: #F7941E;
+            color: #fff;
+        }
+        
+        .required:after {
+            content: "*";
+            color: red;
+        }
+    #custom-button{
+        cursor: pointer;
+    }
 }
     </style>
 </head>
@@ -535,14 +547,14 @@ table tbody tr {
    <input type="checkbox" id="menu-toggle">
     <div class="sidebar">
         <div class="side-header">
-            <h3>M<span>odern</span></h3>
+            <h3>MoneyRecognition</h3>
         </div>
         
         <div class="side-content">
             <div class="profile">
                 <div class="profile-img bg-img" style="background-image: url(img/3.jpeg)"></div>
                 <h4>David Green</h4>
-                <small>Art Director</small>
+                <small>Director</small>
             </div>
 
             <div class="side-menu">
@@ -550,7 +562,7 @@ table tbody tr {
                     <li>
                        <a href="" class="active">
                             <span class="las la-home"></span>
-                            <small>Dashboard</small>
+                            <small>My Dashboard</small>
                         </a>
                     </li>
                 </ul>
@@ -569,18 +581,7 @@ table tbody tr {
                 <div class="header-menu">
                     <label for="">
                         <span class="las la-search"></span>
-                    </label>
-                    
-                    <div class="notify-icon">
-                        <span class="las la-envelope"></span>
-                        <span class="notify">4</span>
-                    </div>
-                    
-                    <div class="notify-icon">
-                        <span class="las la-bell"></span>
-                        <span class="notify">3</span>
-                    </div>
-                    
+                    </label>                    
                     <div class="user">
                         <div class="bg-img" style="background-image: url(img/1.jpeg)"></div>
                         
@@ -595,7 +596,7 @@ table tbody tr {
         <main>
             
             <div class="page-header">
-                <h1>Dashboard</h1>
+                <h1>Admin Dashboard</h1>
                 <small>Home / Dashboard</small>
             </div>
             
@@ -605,11 +606,11 @@ table tbody tr {
 
                     <div class="card">
                         <div class="card-head">
-                            <h2>107,200</h2>
+                            <h2>{{ model_names|length }}</h2>
                             <span class="las la-user-friends"></span>
                         </div>
                         <div class="card-progress">
-                            <small>User activity this month</small>
+                            <small>Total number of models</small>
                             <div class="card-indicator">
                                 <div class="indicator one" style="width: 60%"></div>
                             </div>
@@ -657,32 +658,86 @@ table tbody tr {
 
                 </div>
 
+                <div class="page-header">
+                    <h1>Create Model</h1>
+                    <small>Enter required informations</small>
+                </div>
 
                 <div class="records table-responsive">
-
                     <div class="record-header">
                         <div class="add">
-                            <span>Entries</span>
-                            <select name="" id="">
-                                <option value="">ID</option>
-                            </select>
-                            <button>Add record</button>
-                        </div>
+                            <form method="POST" action="/admin" enctype="multipart/form-data">
+                                <label style="font-family: 'Merriweather', sans-serif;padding: 1rem 0re; text-align: left;color: #C3447A;font-size: .9rem;font-weight: bold;" for="model_name">Model Name:</label>
+                                <input style="border: 1px solid #C3447A;height: 37px;border-radius: 5px;" type="text" id="model_name" name="model_name" >
+                            
+                                <input type="file" id="real-file"  hidden="hidden" name="modelh5"/>
+                                <button id="custom-button" type="button" style="margin-Left :50px; color: #C3447A; background-color:transparent; border: 1px solid #C3447A;">Choose a modelh5 file  </button>
+                                <span id="custom-text" style="color: #aaa;">No file choosen, yet</span>
+                                
+                                <script type="text/javascript">
+                                    const realFileBtn = document.getElementById("real-file");
+                                    const customBtn = document.getElementById("custom-button");
+                                    const customTxt = document.getElementById("custom-text");
 
-                        <div class="browse">
-                           <input type="search" placeholder="Search" class="record-search">
-                            <select name="" id="">
-                                <option value="">Status</option>
-                            </select>
+                                    customBtn.addEventListener("click", function() {
+                                        realFileBtn.click();
+                                    });
+
+                                    realFileBtn.addEventListener("change", function() {
+                                        if (realFileBtn.value) {
+                                            customTxt.innerHTML = realFileBtn.value.match(
+                                                /[\/\\]([\w\d\s\.\-\(\)]+)$/
+                                                )[1];
+                                            } else {
+                                                customTxt.innerHTML = "No file chosen, yet.";
+                                            }
+                                        });
+
+                                </script>
+
+                                <input type="file" id="real-filelabel"  hidden="hidden" name="label"/>
+                                <button id="custom-buttonlabel" type="button" style="margin-Left :50px; color: #C3447A; background-color:transparent; border: 1px solid #C3447A;">Choose a label file </button>
+                                <span id="custom-textlabel" style="color: #aaa;">No file choosen, yet</span>
+                                
+                                <script type="text/javascript">
+                                    const realFileBtnlabel = document.getElementById("real-filelabel");
+                                    const customBtnlabel = document.getElementById("custom-buttonlabel");
+                                    const customTxtlabel = document.getElementById("custom-textlabel");
+
+                                    customBtnlabel.addEventListener("click", function() {
+                                        realFileBtnlabel.click();
+                                    });
+
+                                    realFileBtnlabel.addEventListener("change", function() {
+                                        if (realFileBtnlabel.value) {
+                                            customTxtlabel.innerHTML = realFileBtnlabel.value.match(
+                                                /[\/\\]([\w\d\s\.\-\(\)]+)$/
+                                                )[1];
+                                            } else {
+                                                customTxtlabel.innerHTML = "No file chosen, yet.";
+                                            }
+                                        });
+
+                                </script>
+
+
+
+                                <button type="submit" style="margin-Left :150px ;">Add a new model</button>
+                            </form>           
+                                                        
                         </div>
                     </div>
-
+                </div>
+                <div class="page-header">
+                    <h1>Model List</h1>
+                </div>
+                <div class="records table-responsive"></div>
                     <div>
                         <table width="100%">
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th><span class="las la-sort"></span> CLIENT</th>
+                                    <th><span class="las la-sort"></span> Model Name</th>
                                     <th><span class="las la-sort"></span> TOTAL</th>
                                     <th><span class="las la-sort"></span> ISSUED DATE</th>
                                     <th><span class="las la-sort"></span> BALANCE</th>
@@ -690,19 +745,19 @@ table tbody tr {
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for model_name in model_names %}
                                 <tr>
-                                    <td>#5033</td>
+                                    <td>#{{ loop.index }}</td>
                                     <td>
                                         <div class="client">
                                            <div class="client-img bg-img" style="background-image: url(img/3.jpeg)"></div>
                                             <div class="client-info">
-                                                <h4>Andrew Bruno</h4>
-                                                <small>bruno@crossover.org</small>
+                                                <h4>{{ model_name }}</h4>                                                
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        $3171
+                                        
                                     </td>
                                     <td>
                                         19 April, 2022
@@ -711,238 +766,14 @@ table tbody tr {
                                         -$205
                                     </td>
                                     <td>
-                                        <div class="actions">
-                                            <span class="lab la-telegram-plane"></span>
-                                            <span class="las la-eye"></span>
-                                            <span class="las la-ellipsis-v"></span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#5033</td>
-                                    <td>
-                                        <div class="client">
-                                           <div class="client-img bg-img" style="background-image: url(img/1.jpeg)"></div>
-                                            <div class="client-info">
-                                                <h4>Exty Bruno</h4>
-                                                <small>exty@crossover.org</small>
+                                        <form method="POST" action="{{ url_for('delete_model', model_name=model_name) }}">
+                                            <div class="add">
+                                                <button type="submit">Delete</button>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        $3171
-                                    </td>
-                                    <td>
-                                        19 April, 2022
-                                    </td>
-                                    <td>
-                                        -$205
-                                    </td>
-                                    <td>
-                                        <div class="actions">
-                                            <span class="lab la-telegram-plane"></span>
-                                            <span class="las la-eye"></span>
-                                            <span class="las la-ellipsis-v"></span>
-                                        </div>
+                                        </form>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>#5033</td>
-                                    <td>
-                                        <div class="client">
-                                           <div class="client-img bg-img" style="background-image: url(img/1.jpeg)"></div>
-                                            <div class="client-info">
-                                                <h4>Exty Bruno</h4>
-                                                <small>exty@crossover.org</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        $2171
-                                    </td>
-                                    <td>
-                                        19 April, 2022
-                                    </td>
-                                    <td>
-                                        <span class="paid">Paid</span>
-                                    </td>
-                                    <td>
-                                        <div class="actions">
-                                            <span class="lab la-telegram-plane"></span>
-                                            <span class="las la-eye"></span>
-                                            <span class="las la-ellipsis-v"></span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#5033</td>
-                                    <td>
-                                        <div class="client">
-                                           <div class="client-img bg-img" style="background-image: url(img/3.jpeg)"></div>
-                                            <div class="client-info">
-                                                <h4>Andrew Bruno</h4>
-                                                <small>bruno@crossover.org</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        $3171
-                                    </td>
-                                    <td>
-                                        19 April, 2022
-                                    </td>
-                                    <td>
-                                        -$205
-                                    </td>
-                                    <td>
-                                        <div class="actions">
-                                            <span class="lab la-telegram-plane"></span>
-                                            <span class="las la-eye"></span>
-                                            <span class="las la-ellipsis-v"></span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#5033</td>
-                                    <td>
-                                        <div class="client">
-                                           <div class="client-img bg-img" style="background-image: url(img/1.jpeg)"></div>
-                                            <div class="client-info">
-                                                <h4>Exty Bruno</h4>
-                                                <small>exty@crossover.org</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        $3171
-                                    </td>
-                                    <td>
-                                        19 April, 2022
-                                    </td>
-                                    <td>
-                                        <span class="paid">Paid</span>
-                                    </td>
-                                    <td>
-                                        <div class="actions">
-                                            <span class="lab la-telegram-plane"></span>
-                                            <span class="las la-eye"></span>
-                                            <span class="las la-ellipsis-v"></span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#5033</td>
-                                    <td>
-                                        <div class="client">
-                                           <div class="client-img bg-img" style="background-image: url(img/1.jpeg)"></div>
-                                            <div class="client-info">
-                                                <h4>Exty Bruno</h4>
-                                                <small>exty@crossover.org</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        $2171
-                                    </td>
-                                    <td>
-                                        19 April, 2022
-                                    </td>
-                                    <td>
-                                        <span class="paid">Paid</span>
-                                    </td>
-                                    <td>
-                                        <div class="actions">
-                                            <span class="lab la-telegram-plane"></span>
-                                            <span class="las la-eye"></span>
-                                            <span class="las la-ellipsis-v"></span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#5033</td>
-                                    <td>
-                                        <div class="client">
-                                           <div class="client-img bg-img" style="background-image: url(img/3.jpeg)"></div>
-                                            <div class="client-info">
-                                                <h4>Andrew Bruno</h4>
-                                                <small>bruno@crossover.org</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        $3171
-                                    </td>
-                                    <td>
-                                        19 April, 2022
-                                    </td>
-                                    <td>
-                                        -$205
-                                    </td>
-                                    <td>
-                                        <div class="actions">
-                                            <span class="lab la-telegram-plane"></span>
-                                            <span class="las la-eye"></span>
-                                            <span class="las la-ellipsis-v"></span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#5033</td>
-                                    <td>
-                                        <div class="client">
-                                           <div class="client-img bg-img" style="background-image: url(img/1.jpeg)"></div>
-                                            <div class="client-info">
-                                                <h4>Exty Bruno</h4>
-                                                <small>exty@crossover.org</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        $3171
-                                    </td>
-                                    <td>
-                                        19 April, 2022
-                                    </td>
-                                    <td>
-                                        -$205
-                                    </td>
-                                    <td>
-                                        <div class="actions">
-                                            <span class="lab la-telegram-plane"></span>
-                                            <span class="las la-eye"></span>
-                                            <span class="las la-ellipsis-v"></span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#5033</td>
-                                    <td>
-                                        <div class="client">
-                                           <div class="client-img bg-img" style="background-image: url(img/1.jpeg)"></div>
-                                            <div class="client-info">
-                                                <h4>Exty Bruno</h4>
-                                                <small>exty@crossover.org</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        $2171
-                                    </td>
-                                    <td>
-                                        19 April, 2022
-                                    </td>
-                                    <td>
-                                        <span class="paid">Paid</span>
-                                    </td>
-                                    <td>
-                                        <div class="actions">
-                                            <span class="lab la-telegram-plane"></span>
-                                            <span class="las la-eye"></span>
-                                            <span class="las la-ellipsis-v"></span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -954,5 +785,6 @@ table tbody tr {
         </main>
         
     </div>
+    
 </body>
 </html>
