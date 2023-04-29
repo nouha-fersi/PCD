@@ -6,7 +6,18 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from flask_cors import CORS
 from pymongo.database import Database
-from bson.objectid import ObjectId
+import matplotlib.pyplot as plt
+from io import BytesIO
+import io
+import base64
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+from decimal import Decimal
+from datetime import datetime
+import json
+from bson import ObjectId
+import numpy as np
+
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb+srv://nouhafersi:1234@cluster0.tgcshlz.mongodb.net/?retryWrites=true&w=majority'  # Update with your database name
@@ -105,6 +116,63 @@ def delete_model(model_name):
             return {'error': 'Model file not found'}
     else:
         return {'error': 'Model not found'}
+    
+    
+#route for datasetinfo         
+@app.route('/info')
+def info():
+    # Connect to MongoDB Atlas
+    uri = "mongodb+srv://new:new20246653@cluster0.jfnbnlt.mongodb.net/?retryWrites=true&w=majority"
+    client = MongoClient(uri)
+    db = client['images']
+    #size of images
+    db_size = client.images.command("dbstats")["dataSize"]
+    #total number of images 
+    total_count = 0
+    for collection_name in db.list_collection_names():
+      collection = db[collection_name]
+      total_count += collection.estimated_document_count()
+    #las date of database modification
+    stats = db.command("dbStats")
+
+    try:
+      last_modified = datetime.utcfromtimestamp(stats['fsyncLock']['timestamp']['$timestamp']['t'])
+    except KeyError:
+      last_modified = None
+    
+    # Get the count of images in each collection
+    counts = []
+    for collection_name in db.list_collection_names():
+        count = db[collection_name].count_documents({})
+        counts.append((collection_name, count))
+    
+
+    # Calculate the percentage of images in each collection
+    total_count = sum(count for _, count in counts)
+    percentages = []
+    for collection_name, count in counts:
+        percentage = count / total_count * 100
+        percentages.append((collection_name, percentage))
+
+    # Create a pie chart of the percentages
+    fig = Figure(figsize=(6, 6), dpi=100)
+    ax = fig.add_subplot(111)
+    labels = [collection for collection, _ in percentages]
+    sizes = [percent for _, percent in percentages]
+    ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')
+    canvas = FigureCanvas(fig)
+    png_output = io.BytesIO()
+    canvas.print_png(png_output)
+    data = png_output.getvalue()
+
+    # Convert the pie chart to base64 string for display in the HTML template
+    image_url = base64.b64encode(data).decode()
+
+    # Render the template with the percentages and pie chart URL
+    return render_template('info.html', percentages=percentages, image_url=image_url, total_images=total_count, total_size=db_size, date=last_modified)
+
+
 
 
 if __name__ == '__main__':
