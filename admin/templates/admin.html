@@ -544,7 +544,7 @@ table tbody tr {
     </style>
 </head>
 <body>
-   <input type="checkbox" id="menu-toggle">
+    <input type="checkbox" id="menu-toggle">
     <div class="sidebar">
         <div class="side-header">
             <h3>MoneyRecognition</h3>
@@ -725,9 +725,6 @@ table tbody tr {
                                         });
 
                                 </script>
-
-
-
                                 <button type="submit" style="margin-Left :150px ;">Add a new model</button>
                             </form>           
                                                         
@@ -739,49 +736,46 @@ table tbody tr {
                 </div>
                 <div class="records table-responsive"></div>
                     <div>
-                        <table width="100%">
-                            <thead>
+                        <form method="POST" action="{{ url_for('submit_model') }}">
+                            <table width="100%">
+                              <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th><span class="las la-sort"></span> Model Name</th>
-                                    <th><span class="las la-sort"></span> TOTAL</th>
-                                    <th><span class="las la-sort"></span> ISSUED DATE</th>
-                                    <th><span class="las la-sort"></span> BALANCE</th>
-                                    <th><span class="las la-sort"></span> ACTIONS</th>
+                                  <th>#</th>
+                                  <th><span class="las la-sort"></span> Model Name</th>
+                                  <th><span class="las la-sort"></span> Label Name</th>
+                                  <th><span class="las la-sort"></span> Issued Date</th>
+                                  <th><span class="las la-sort"></span> Balance</th>
+                                  <th><span class="las la-sort"></span> Actions</th>
                                 </tr>
-                            </thead>
-                            <tbody>
+                              </thead>
+                              <tbody>
                                 {% for model_name in model_names %}
                                 <tr>
-                                    <td>#{{ loop.index }}</td>
-                                    <td>
-                                        <div class="client">
-                                           <div class="client-img bg-img" style="background-image: url(img/3.jpeg)"></div>
-                                            <div class="client-info">
-                                                <h4>{{ model_name }}</h4>                                                
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        
-                                    </td>
-                                    <td>
-                                        19 April, 2022
-                                    </td>
-                                    <td>
-                                        -$205
-                                    </td>
-                                    <td>
-                                        <form method="POST" action="{{ url_for('delete_model', model_name=model_name) }}">
-                                            <div class="add">
-                                                <button type="submit">Delete</button>
-                                            </div>
-                                        </form>
-                                    </td>
+                                  <td>{{ loop.index }}</td>
+                                  <td>
+                                    <div class="form-check">
+                                      <input class="form-check-input" type="radio" name="model_name" value="{{ model_name }}" id="model{{ loop.index }}" {% if selected_model == model_name %}checked{% endif %}>
+                                      <label class="form-check-label" for="model{{ loop.index }}">
+                                        {{ model_name }}
+                                      </label>
+                                    </div>
+                                  </td>
+                                  <td>{{ label_name }}</td>
+                                  <td>19 April, 2022</td>
+                                  <td>-$205</td>
+                                  <td>
+                                    <form method="POST" action="{{ url_for('delete_model', model_name=model_name) }}">
+                                      <div class="add">
+                                        <button type="submit">Delete</button>
+                                      </div>
+                                    </form>
+                                  </td>
                                 </tr>
                                 {% endfor %}
-                            </tbody>
-                        </table>
+                              </tbody>
+                            </table>
+                            <button type="submit" class="btn btn-primary mt-3">Save Selection</button>
+                          </form>
                     </div>
 
                 </div>

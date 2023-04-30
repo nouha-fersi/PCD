@@ -9,12 +9,10 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/animation.dart';
 import 'dart:async';
 import 'dart:math' as math ;
+
 double percentage = 0.0;
 const double pi = 3.14159265358979323846;
 Color beige = Color(0xFFF5F5DC);
-
-
-
 List<CameraDescription> cameras = [];
 
 Future<void> main() async {
@@ -51,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late VideoPlayerController _controller1;
   late Future<void> _initializeVideoPlayerFuture;
   FlutterTts flutterTts1 = FlutterTts();
-  String ttsText1 = "yorja annakr ala ayi makan fi achacha li fateh al camera ";
+  String ttsText1 = "مرحبا عزيزي المستخدم  في تطبيق كشف النقود التونسية. يرجى النقر في أي مكان على الشاشة لفتح الكاميرا";
   Timer? _timer;
   @override
   void initState() {
@@ -67,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
     await flutterTts1.setLanguage("ar");
     await flutterTts1.setPitch(1);
     await flutterTts1.setSpeechRate(0.5);
-    const duration = Duration(seconds: 6);
+    const duration = Duration(seconds: 10);
     await flutterTts1.speak(ttsText1);
     _timer = Timer.periodic(duration, (_) {
       if (mounted) {
@@ -130,14 +128,14 @@ class CameraApp extends StatefulWidget {
 
 class _CameraAppState extends State<CameraApp> {
   FlutterTts flutterTts2 = FlutterTts();
-  String ttsText2 = "yorja annakr ala ayi makan fi achacha li fateh al camera ";
+  String ttsText2 = "حسنت ، الكاميرا مفتوحة الآن. يرجى وضع القطعة المالية بشكل صحيح والنقر في أي مكان على الشاشة لالتقاط الصورة";
   Timer? _timer2;
   late CameraController _controller;
   void speak2() async {
     await flutterTts2.setLanguage("ar");
     await flutterTts2.setPitch(1);
     await flutterTts2.setSpeechRate(0.5);
-    const duration = Duration(seconds: 6);
+    const duration = Duration(seconds: 10);
     await flutterTts2.speak(ttsText2);
     _timer2 = Timer.periodic(duration, (_) {
       if (mounted) {
@@ -223,7 +221,7 @@ class _ImagePreviewState extends State<ImagePreview> with TickerProviderStateMix
   final double angle = 2 * math.pi * percentage;
   bool _isImageTapped = false;
   late String output;
-  String url = 'http://192.168.1.21:5000/predict';
+  String url = 'http://192.168.1.12:5000/predict';
 
   Future<String> fetchdata(File imageFile) async {
     // Create a multipart request with the image file in the request body
@@ -356,9 +354,3 @@ class _ImagePreviewState extends State<ImagePreview> with TickerProviderStateMix
 
   }
 }
-
-
-
-
-
-

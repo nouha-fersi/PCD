@@ -6,18 +6,12 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from flask_cors import CORS
 from pymongo.database import Database
-import matplotlib.pyplot as plt
-from io import BytesIO
-import io
-import base64
+from bson.objectid import ObjectId
+from tensorflow.keras.models import load_model
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
-from decimal import Decimal
 from datetime import datetime
-import json
-from bson import ObjectId
-import numpy as np
-
+import base64
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb+srv://nouhafersi:1234@cluster0.tgcshlz.mongodb.net/?retryWrites=true&w=majority'  # Update with your database name
@@ -73,15 +67,51 @@ def admin():
 
         return render_template('admin.html', model_names=model_names)
 
-@app.route('/file/<file_id>')
-def file(file_id):
-    db = client.models  # Access the Database instance from the mongo object
-    fs = GridFS(db, collection='fs')  # Create a GridFS object with the Database instance and collection name
-    file = fs.find_one({"_id": ObjectId(file_id)})  # Find the file in GridFS by ObjectId
-    if file is not None:
-        return
 
+
+import io
+@app.route('/download')
+def download_file():
+    db = client.models  # Access the Database instance from the mongo object
+    fs = GridFS(db, collection='fs')
+    filename = 'labels.txt'
+    file_doc = fs.find_one({'filename': filename})
+    if file_doc is not None:
+        file = fs.find_one({"filename": filename})
+        if file is not None:
+            model_data = file.read()
+            model_file = io.BytesIO(model_data)
+            model_file.seek(0)
+            return send_file(model_file, attachment_filename=file.filename, as_attachment=False)
+        else:
+            return f"File '{filename}' not found in MongoDB GridFS!"
+    else:
+        return f"File '{filename}' not found in MongoDB GridFS!" 
     
+import tempfile
+
+@app.route('/load-model/<string:filename>', methods=['POST'])
+def load_model_from_file(filename):
+    db = client.models
+    fs = GridFS(db, collection='fs')
+    filename = 'keras_model.h5'
+    file_doc = fs.find_one({'filename': 'keras_model.h5'})
+    if file_doc is not None:
+        file = fs.find_one({"filename": 'keras_model.h5'})
+        if file is not None:
+            model_data = file.read()
+            with tempfile.NamedTemporaryFile(delete=False) as tmp:
+                tmp.write(model_data)
+                tmp.flush()
+                model = load_model(tmp.name)
+                
+                return f"Loaded model from '{filename}'"
+        else:
+            return f"File '{filename}' not found in MongoDB GridFS!"
+    else:
+        return f"File '{filename}' not found in MongoDB GridFS!"
+
+      
 @app.route('/delete/<string:model_name>', methods=['POST'])
 def delete_model(model_name):
     db = client.models
@@ -117,7 +147,20 @@ def delete_model(model_name):
     else:
         return {'error': 'Model not found'}
     
-    
+@app.route('/submit_model', methods=['POST'])
+def submit_model():
+    db = client.models
+    model_name = request.form['model_name']
+    if not (db['choosing_model'].find_one({'x': model_name})):
+        db.choosing_model.update_one({}, {'$set': {'x': model_name}})
+    fs = GridFS(db, collection='fs')  # Create a GridFS object with the Database instance and collection name
+    files = db['models'].find()  # Find all documents in the 'models' collection
+    model_names = [file['model_name'] for file in files]  # Extract the 'model_name' field from each document
+    return render_template('admin.html', model_names=model_names)
+
+
+
+
 #route for datasetinfo         
 @app.route('/info')
 def info():
@@ -171,8 +214,6 @@ def info():
 
     # Render the template with the percentages and pie chart URL
     return render_template('info.html', percentages=percentages, image_url=image_url, total_images=total_count, total_size=db_size, date=last_modified)
-
-
 
 
 if __name__ == '__main__':
