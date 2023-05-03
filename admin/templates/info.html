@@ -3,113 +3,217 @@
 <head>
 	<title>Image Information</title>
 	<style>
-		body {
-			background-color: #e6f2ff;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			height: 100vh;
-			margin: 0;
-			padding: 0;
-			font-family: Arial, sans-serif;
-		}
-		h1 {
-			text-align: center;
-			margin: 20px;
-		}
-    .info-title {
-  animation-name: slide-in;
-  animation-duration: 1s;
-  animation-fill-mode: forwards;
+/* General Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  background-color: #fff;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 165px;
+  background-color: #34568B;
+  z-index: 1;
+  transition: all 0.3s ease;
+  overflow-x: hidden;
+}
+
+.sidebar.show {
+  width: 70px;
+}
+
+.side-content {
+  padding: 20px;
+  color: #fff;
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+
+.profile-img {
+    height: 80px;
+    width: 80px;
+    display: inline-block;
+    margin: 0 auto .5rem auto;
+    border: 3px solid #92A8D1;
+}
+.bg-img {
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 50%;
+    background-size: cover;
+}
+.profile-img.bg-img {
+    background-image: url("{{ url_for('static', filename='user1.png') }}");
+}
+
+
+.profile h4 {
+  margin: 10px 0;
+}
+
+.profile small {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.side-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.side-menu li {
+  margin: 10px 0;
+}
+
+.side-menu a {
+  display: flex;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.side-menu a.active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.side-menu a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.side-menu span {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.side-menu small {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* Content Styles */
+.info-title {
+  font-size: 36px;
+  margin-top: 50px;
+  margin-left: 650px;
+  margin-bottom: 30px;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.img-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 180px;
+  margin-top: 30px;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.info-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 300px;
+  margin-top: 30px;
   opacity: 0;
+  animation: fadeIn 0.5s ease-out forwards;
+
 }
 
-@keyframes slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-		.img-container {
-    animation-name: zoom-in;
-    animation-duration: 0.5s;
-    animation-fill-mode: forwards;
-    opacity: 0;
-}
-
-@keyframes zoom-in {
-    from {
-        transform: scale(0);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-		img {
-			max-width: 100%;
-			height: auto;
-		}
-		.info-container {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
-			justify-content: center;
-			width: 80%;
-			background-color: #fff;
-			padding: 20px;
-			border-radius: 10px;
-			box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-		}
-		.info-box {
-  flex: 1;
-  min-width: 200px;
-  margin: 10px;
-  padding: 10px;
-  background-color: #f5f5f5;
-  border-radius: 5px;
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-  text-align: center;
+.info-box {
+  width: 300px;
+  height: 150px;
+  padding: 20px;
+  background-color: #d9e3e7;
+  margin-right: 30px;
+  margin-bottom: 30px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   opacity: 0;
-  animation-name: fade-in;
-  animation-duration: 1s;
-  animation-fill-mode: forwards;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+.info-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+.info-box h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
 }
 
-@keyframes fade-in {
+.info-box p {
+  font-size: 18px;
+  opacity: 0.8;
+}
+
+/* Animations */
+@keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-		.info-box h2 {
-			font-size: 20px;
-			margin: 10px;
-		}
-		.info-box p {
-			font-size: 16px;
-			margin: 10px;
-		}
+.fadeIn {
+  animation: fadeIn 0.5s ease-out;
+  animation-fill-mode: both;
+}
+
 	</style>
 </head>
 <body>
+  <input type="checkbox" id="menu-toggle">
+  <div class="sidebar">
+      <div class="side-content">
+          <div class="profile">
+              <div class="profile-img bg-img"></div>
+              <h4>David Green</h4>
+              <small>Admin</small>
+          </div>
+
+          <div class="side-menu">
+              <ul>
+                  <li>
+                      <a href="/admin">
+                          <span class="las la-home"></span>
+                          <small>My Dashboard</small>
+                      </a>
+                  </li>
+                  <li>
+                      <a href="/info" class="active">
+                          <span class="las la-database"></span>
+                          <small>Database Info</small>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
+
+  <!-- Your datainfo content here -->
+</body>
+</html>
+
 	<h1 class ='info-title'>Image Information</h1>
 	<div class="img-container">
-    <img src="data:image/png;base64,{{ image_url }}" alt="Pie Chart" width="400" height="400">
+    <img src="data:image/png;base64,{{ image_url }}" alt="Pie Chart" width="400" height="400" >
 
 	</div>
 	<div class="info-container">
@@ -124,6 +228,31 @@
 		<div class="info-box">
 			<h2>Total Number Of images</h2>
 			<p>{{ total_images}} </p>
+      <script>
+  const getAccuracyBtn = document.getElementById('get-accuracy-btn');
+  const accuracyPlot = document.getElementById('accuracy-plot');
+
+  getAccuracyBtn.addEventListener('click', async () => {
+    const model_name = 'your_model_name_here';
+    const response = await fetch(`/accuracy/${model_name}`);
+    const data = await response.json();
+
+    // Display the accuracy data as a list
+    const accuracyList = document.createElement('ul');
+    data.accuracy.forEach(accuracy => {
+      const li = document.createElement('li');
+      li.innerText = accuracy;
+      accuracyList.appendChild(li);
+    });
+    accuracyPlot.appendChild(accuracyList);
+
+    // Display the accuracy plot as an image
+    const accuracyImg = document.createElement('img');
+    accuracyImg.src = `data:image/png;base64,${data.image_b64}`;
+    accuracyPlot.appendChild(accuracyImg);
+  });
+</script>
+
 		</div>
 	</div>
 </body>

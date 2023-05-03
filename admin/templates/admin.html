@@ -47,6 +47,7 @@
     align-items: center;
 }
 
+
 .side-header h3, side-head span {
     color: #fff;
     font-weight: 400;
@@ -98,6 +99,10 @@
     margin: 0 auto .5rem auto;
     border: 3px solid #92A8D1;
 }
+.profile-img.bg-img {
+    background-image: url("{{ url_for('static', filename='user.png') }}");
+}
+
 
 .profile h4 {
     color: #fff;
@@ -260,10 +265,12 @@ main {
     padding: 1.3rem 1rem;
     background: #E9edf2;
     border-bottom: 1px solid #dee2e8;
+    text-align: center;
 }
 
 .page-header h1, .page-header small {
     color: #74767d;
+    text-align: center;
 }
 
 .page-content {
@@ -350,10 +357,10 @@ main {
     justify-content: space-between;
     align-items: center;
 }
-
 .add, .browse {
     display: flex;
     align-items: center;
+    flex-direction: row;
 }
 
 .add span {
@@ -361,32 +368,39 @@ main {
     margin-right: .6rem;
     font-size: .9rem;
     color: #666;
+    
 }
 
-input, button, select {
-    outline: none;
+.add input, .browse input {
+    margin-right: 1rem;
 }
+
+.add button, .browse button, .add select, .browse select {
+    margin-left: 0.5rem;
+    background: var(--main-color);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    border-radius: 4px;
+    height: 37px;
+    padding: 0rem ;
+
+}
+
+
 
 .add select, .browse input, .browse select {
     height: 35px;
     border: 1px solid #b0b0b0;
     border-radius: 3px;
     display: inline-block;
-    width: 75px;
+    width: 90px;
     padding: 0rem .5rem;
     margin-right: .8rem;
     color: #666;
 }
 
-.add button {
-    background: var(--main-color);
-    color: #fff;
-    height: 37px;
-    border-radius: 4px;
-    padding: 0rem 1rem;
-    border: none;
-    font-weight: 600;
-}
+
 
 .browse input {
     width: 150px;
@@ -546,15 +560,14 @@ table tbody tr {
 <body>
     <input type="checkbox" id="menu-toggle">
     <div class="sidebar">
-        <div class="side-header">
-            <h3>MoneyRecognition</h3>
-        </div>
+        
         
         <div class="side-content">
             <div class="profile">
-                <div class="profile-img bg-img" style="background-image: url(img/3.jpeg)"></div>
+                <div class="profile-img bg-img" ></div>
+
                 <h4>David Green</h4>
-                <small>Director</small>
+                <small>Admin</small>
             </div>
 
             <div class="side-menu">
@@ -575,6 +588,7 @@ table tbody tr {
             </div>
         </div>
     </div>
+    
     
     <div class="main-content">
         
@@ -603,7 +617,6 @@ table tbody tr {
             
             <div class="page-header">
                 <h1>Admin Dashboard</h1>
-                <small>Home / Dashboard</small>
             </div>
             
             <div class="page-content">
@@ -625,11 +638,11 @@ table tbody tr {
 
                     <div class="card">
                         <div class="card-head">
-                            <h2>340,230</h2>
+                            <h2>3</h2>
                             <span class="las la-eye"></span>
                         </div>
                         <div class="card-progress">
-                            <small>Page views</small>
+                            <small>Number Of Admins </small>
                             <div class="card-indicator">
                                 <div class="indicator two" style="width: 80%"></div>
                             </div>
@@ -673,8 +686,16 @@ table tbody tr {
                     <div class="record-header">
                         <div class="add">
                             <form method="POST" action="/admin" enctype="multipart/form-data">
-                                <label style="font-family: 'Merriweather', sans-serif;padding: 1rem 0re; text-align: left;color: #C3447A;font-size: .9rem;font-weight: bold;" for="model_name">Model Name:</label>
-                                <input style="border: 1px solid #C3447A;height: 37px;border-radius: 5px;" type="text" id="model_name" name="model_name" >
+                                <label style="font-family: 'Merriweather', sans-serif; padding: 1rem 0; text-align: left; color: #C3447A; font-size: .9rem; font-weight: bold; margin-right: 1rem;" for="model_name"></label>
+<input style="border: 1px solid #C3447A; height: 37px; border-radius: 5px; padding-left: 10px;" type="text" id="model_name" name="model_name" placeholder="Model Name" >
+<style>
+    ::placeholder {
+        color: #C3447A;
+        font-weight: bold;
+    }
+</style>
+
+                                
                             
                                 <input type="file" id="real-file"  hidden="hidden" name="modelh5"/>
                                 <button id="custom-button" type="button" style="margin-Left :50px; color: #C3447A; background-color:transparent; border: 1px solid #C3447A;">Choose a modelh5 file  </button>
@@ -725,7 +746,7 @@ table tbody tr {
                                         });
 
                                 </script>
-                                <button type="submit" style="margin-Left :150px ;">Add a new model</button>
+                                <button type="submit" style="margin-Left :150px ;width : 150px ;">Add a new model</button>
                             </form>           
                                                         
                         </div>
@@ -766,7 +787,7 @@ table tbody tr {
                                   <td>
                                     <form method="POST" action="{{ url_for('delete_model', model_name=model_name) }}">
                                       <div class="add">
-                                        <button type="submit">Delete</button>
+                                        <button type="submit" style="width :100px;">Delete</button>
                                       </div>
                                     </form>
                                   </td>
@@ -774,7 +795,7 @@ table tbody tr {
                                 {% endfor %}
                               </tbody>
                             </table>
-                            <button type="submit" class="btn btn-primary mt-3">Save Selection</button>
+                            
                           </form>
                     </div>
 
